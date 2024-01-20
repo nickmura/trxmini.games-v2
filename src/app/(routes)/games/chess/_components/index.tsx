@@ -146,6 +146,23 @@ export const Chess = ({}) => {
       if (data?.data?.chessState) {
         chess.load(data?.data?.chessState);
         setFen(chess.fen());
+
+        if (chess.isGameOver()) {
+          // check if move led to "game over"
+          if (chess.isCheckmate()) {
+            // if reason for game over is a checkmate
+            // Set message to checkmate.
+            setOver(
+              `Checkmate! ${chess.turn() === "w" ? "black" : "white"} wins!`
+            );
+            // The winner is determined by checking which side made the last move
+          } else if (chess.isDraw()) {
+            // if it is a draw
+            setOver("Draw"); // set message to "Draw"
+          } else {
+            setOver("Game over");
+          }
+        }
       }
 
       router.replace(url.href);
@@ -209,13 +226,29 @@ export const Chess = ({}) => {
 
   console.log({ playerInfo });
 
+  console.log(chess.isGameOver());
+
   return (
     <div className="grid place-items-center h-screen">
-      {over}
-      <div className="w-[500px]">
+      <div className="w-[500px] relative">
+        {over && (
+          <div className="absolute inset-0 bg-black/40 z-10 grid place-items-center">
+            <div className="font-bold text-white">
+              <div>{over}</div>
+              <div className="grid place-items-center mt-4">
+                <button className="bg-black px-4 py-1.5 rounded-lg">
+                  Start a new game
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {isInGameRoom && (
           <Chessboard
-            arePiecesDraggable={chess.turn() === playerInfo.side}
+            arePiecesDraggable={
+              !chess.isGameOver() || chess.turn() === playerInfo.side
+            }
             position={fen}
             onPieceDrop={handleDrop}
             boardWidth={500}
@@ -225,14 +258,25 @@ export const Chess = ({}) => {
               if (piece?.startsWith(playerInfo.side)) return true;
               return false;
             }}
+            // ch
+            // showPromotionDialog
           />
         )}
       </div>
       {isInGameRoom ? (
-        <>{chess.turn() === playerInfo.side ? "Your turn" : "Their turn"}</>
+        <>
+          {!chess.isGameOver() && (
+            <>{chess.turn() === playerInfo.side ? "Your turn" : "Their turn"}</>
+          )}
+        </>
       ) : (
         <div>
-          <button onClick={joinGame}>Join a game</button>
+          <button
+            onClick={joinGame}
+            className="bg-black px-4 py-1.5 rounded-lg text-white font-semibold"
+          >
+            Join a game
+          </button>
         </div>
       )}
       <div>{/* <pre>{JSON.stringify(gameRoom, null, 2)}</pre> */}</div>
