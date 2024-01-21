@@ -1,4 +1,4 @@
-import { Chess } from "./_components";
+import { Chess } from "./_components/Chess";
 
 const ChessGame = ({}) => {
   return <Chess />;

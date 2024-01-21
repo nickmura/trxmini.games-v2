@@ -1,11 +1,19 @@
 "use client";
-
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-// import Chessboard from "chessboardjsx";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  forwardRef,
+} from "react";
 import { Chessboard } from "react-chessboard";
-import { Chess as ChessJS, Piece, Square } from "chess.js";
+import { Chess as ChessJS, Square } from "chess.js";
 import { Socket, io } from "socket.io-client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { StalemateDialog } from "./StalemateDialog";
+import { CheckmateDialog } from "./CheckmateDialog";
+import { Button } from "@/components/ui/button";
+import { CustomSquareProps } from "react-chessboard/dist/chessboard/types";
 
 export const Chess = ({}) => {
   const chess = useMemo(() => new ChessJS(), []); // <- 1
@@ -36,7 +44,6 @@ export const Chess = ({}) => {
         setFen(chess.fen()); // update fen state to trigger a re-render
 
         // console.log("over, checkmate", chess.isGameOver(), chess.isCheckmate());
-
         if (chess.isGameOver()) {
           // check if move led to "game over"
           if (chess.isCheckmate()) {
@@ -67,7 +74,6 @@ export const Chess = ({}) => {
   //   socket.on('move', (move) => {
   //     handleMove(move);
   //   });
-
   //   return () => {
   //     socket.off('move');
   //   };
@@ -86,7 +92,6 @@ export const Chess = ({}) => {
     });
 
     // console.log(socket);
-
     return () => {
       socket.close();
       setSocket(null);
@@ -192,7 +197,6 @@ export const Chess = ({}) => {
   //   updatedGame.move(move);
   //   setGame(updatedGame);
   // };
-
   const handleDrop = (sourceSquare: Square, targetSquare: Square) => {
     const moveData = {
       from: sourceSquare,
@@ -201,12 +205,10 @@ export const Chess = ({}) => {
     };
 
     // return false;
-
     // if (isValidMove(move)) {
     //   socket.emit("move", move);
     //   handleMove(move);
     // }
-
     const move = makeAMove(moveData);
 
     // illegal move
@@ -224,26 +226,55 @@ export const Chess = ({}) => {
 
   const isInGameRoom = gameRoom.roomId;
 
-  console.log({ playerInfo });
+  const checkedSquare = // useMemo(
+    // () =>
+    chess
+      .board()
+      .flat()
+      .find(
+        (chessPiece) =>
+          chessPiece?.type === "k" && chessPiece?.color === chess.turn()
+      )?.square;
+  //   [chess]
+  // );
 
-  console.log(chess.isGameOver());
+  // console.log({ playerInfo });
+
+  // console.log(chess.isGameOver());
+
+  // chess.isStalemate();
+
+  // console.log("is check", chess.isCheck(), chess.turn());
+
+  // console.log(checkedSquare, "checkedSquare");
+
+  // console.log(chess.board());
+
+  // const sq: Square
+  // console.log(chess.("e8"), "from get");
 
   return (
     <div className="grid place-items-center h-screen">
+      <StalemateDialog
+        open={chess.isStalemate()}
+        won={chess.turn() !== playerInfo.side}
+      />
+      <CheckmateDialog
+        open={chess.isCheckmate()}
+        // open={true}
+        won={chess.turn() !== playerInfo.side}
+      />
       <div className="w-[500px] relative">
         {over && (
           <div className="absolute inset-0 bg-black/40 z-10 grid place-items-center">
             <div className="font-bold text-white">
               <div>{over}</div>
               <div className="grid place-items-center mt-4">
-                <button className="bg-black px-4 py-1.5 rounded-lg">
-                  Start a new game
-                </button>
+                <Button>Start a new game</Button>
               </div>
             </div>
           </div>
         )}
-
         {isInGameRoom && (
           <Chessboard
             arePiecesDraggable={
@@ -258,8 +289,13 @@ export const Chess = ({}) => {
               if (piece?.startsWith(playerInfo.side)) return true;
               return false;
             }}
-            // ch
-            // showPromotionDialog
+            customSquare={(props) => (
+              <CustomSquareRenderer
+                {...props}
+                isCheck={chess.isCheck()}
+                kingPosition={checkedSquare}
+              />
+            )}
           />
         )}
       </div>
@@ -271,15 +307,36 @@ export const Chess = ({}) => {
         </>
       ) : (
         <div>
-          <button
-            onClick={joinGame}
-            className="bg-black px-4 py-1.5 rounded-lg text-white font-semibold"
-          >
-            Join a game
-          </button>
+          <Button onClick={joinGame}>Join a game</Button>
         </div>
       )}
       <div>{/* <pre>{JSON.stringify(gameRoom, null, 2)}</pre> */}</div>
     </div>
   );
 };
+
+const CustomSquareRenderer = forwardRef<
+  HTMLDivElement,
+  CustomSquareProps & { isCheck: boolean; kingPosition?: Square }
+>((props, ref) => {
+  // console.log(props.isCheck, props.kingPosition, "props");
+  const { children, square, squareColor, style } = props;
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        ...style,
+        position: "relative",
+        backgroundColor:
+          props.isCheck && square === props.kingPosition
+            ? "red"
+            : (style.backgroundColor as string),
+      }}
+    >
+      {children}
+    </div>
+  );
+});
+
+CustomSquareRenderer.displayName = "CustomSquareRenderer";
