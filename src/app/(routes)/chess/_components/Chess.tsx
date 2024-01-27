@@ -16,15 +16,15 @@ import { Button } from "@/components/ui/button";
 import { CustomSquareProps } from "react-chessboard/dist/chessboard/types";
 
 export const Chess = ({}) => {
-  const chess = useMemo(() => new ChessJS(), []); // <- 1
-  const [fen, setFen] = useState(chess.fen()); // <- 2
+  // const chess = useMemo(() => new ChessJS(), []); // <- 1
+  // const [fen, setFen] = useState(chess.fen()); // <- 2
   const [over, setOver] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null); // const [game, setGame] = useState(new Chess());
-  const [gameRoom, setGameRoom] = useState({
-    roomId: "",
-    player1: "",
-    player2: "",
-  });
+  // const [gameRoom, setGameRoom] = useState({
+  //   roomId: "",
+  //   player1: "",
+  //   player2: "",
+  // });
 
   const [playerInfo, setPlayerInfo] = useState({
     side: "w",
@@ -33,42 +33,62 @@ export const Chess = ({}) => {
     username: "",
   });
 
+  const [stateFromSocket, setStateFromSocket] = useState<{
+    roomId: string;
+    player1: {
+      userId: string | null;
+      side: "w" | "b";
+      isConnected: boolean;
+    };
+    player2: {
+      userId: string | null;
+      side: "w" | "b";
+      isConnected: boolean;
+    };
+    fen: string;
+    turn: "w" | "b";
+  }>();
+
+  console.log({ stateFromSocket });
+
   const searchParams = useSearchParams();
   const router = useRouter();
-  const pathname = usePathname();
+  // const pathname = usePathname();
 
-  const makeAMove = useCallback(
-    (move: { from: string; to: string; promotion: string }) => {
-      try {
-        const result = chess.move(move); // update Chess instance
-        setFen(chess.fen()); // update fen state to trigger a re-render
+  // console.log({ fen });
 
-        // console.log("over, checkmate", chess.isGameOver(), chess.isCheckmate());
-        if (chess.isGameOver()) {
-          // check if move led to "game over"
-          if (chess.isCheckmate()) {
-            // if reason for game over is a checkmate
-            // Set message to checkmate.
-            setOver(
-              `Checkmate! ${chess.turn() === "w" ? "black" : "white"} wins!`
-            );
-            // The winner is determined by checking which side made the last move
-          } else if (chess.isDraw()) {
-            // if it is a draw
-            setOver("Draw"); // set message to "Draw"
-          } else {
-            setOver("Game over");
-          }
-        }
+  // const makeAMove = useCallback(
+  //   (move: { from: string; to: string; promotion: string }) => {
+  //     try {
+  //       const result = chess.move(move); // update Chess instance
+  //       setFen(chess.fen()); // update fen state to trigger a re-render
 
-        return result;
-      } catch (e) {
-        console.log(e, "e");
-        return null;
-      } // null if the move was illegal, the move object if the move was legal
-    },
-    [chess]
-  );
+  //       // console.log("over, checkmate", chess.isGameOver(), chess.isCheckmate());
+  //       // if (chess.isGameOver()) {
+  //       //   // check if move led to "game over"
+  //       //   if (chess.isCheckmate()) {
+  //       //     // if reason for game over is a checkmate
+  //       //     // Set message to checkmate.
+  //       //     setOver(
+  //       //       `Checkmate! ${chess.turn() === "w" ? "black" : "white"} wins!`
+  //       //     );
+  //       //     // The winner is determined by checking which side made the last move
+  //       //   } else if (chess.isDraw()) {
+  //       //     // if it is a draw
+  //       //     setOver("Draw"); // set message to "Draw"
+  //       //   } else {
+  //       //     setOver("Game over");
+  //       //   }
+  //       // }
+
+  //       return result;
+  //     } catch (e) {
+  //       console.log(e, "e");
+  //       return null;
+  //     } // null if the move was illegal, the move object if the move was legal
+  //   },
+  //   [chess]
+  // );
 
   // useEffect(() => {
   //   socket.on('move', (move) => {
@@ -88,7 +108,9 @@ export const Chess = ({}) => {
 
     socket.on("update:chess", (data) => {
       console.log(data, "update:chess");
-      makeAMove(data);
+      // makeAMove(data);
+      // setFen(data?.fen);
+      setStateFromSocket(data);
     });
 
     // console.log(socket);
@@ -96,24 +118,24 @@ export const Chess = ({}) => {
       socket.close();
       setSocket(null);
     };
-  }, [router, makeAMove]);
+  }, [router]);
 
   useEffect(() => {
     if (
       searchParams.get("roomId") &&
-      searchParams.get("roomId") !== "undefined" &&
-      !gameRoom.roomId
+      searchParams.get("roomId") !== "undefined" //&&
+      // !gameRoom.roomId
     ) {
-      console.log("emitting join:chess:room", {
-        roomId: searchParams.get("roomId"),
-        userId: searchParams.get("userId"),
-      });
+      // console.log("emitting join:chess:room", {
+      //   roomId: searchParams.get("roomId"),
+      //   userId: searchParams.get("userId"),
+      // });
       socket?.emit("join:chess:room", {
         roomId: searchParams.get("roomId"),
         userId: searchParams.get("userId"),
       });
     }
-  }, [searchParams, gameRoom, socket]);
+  }, [searchParams, socket]);
 
   useEffect(() => {
     setPlayerInfo((prev) => ({
@@ -126,7 +148,8 @@ export const Chess = ({}) => {
   useEffect(() => {
     socket?.on("joined:chess", (data) => {
       console.log(data, "data");
-      setGameRoom(data?.data);
+      // setGameRoom(data?.data);
+      setStateFromSocket(data?.data);
 
       const url = new URL(window.location.href);
 
@@ -136,7 +159,7 @@ export const Chess = ({}) => {
         playerInfo.userId || url.searchParams.get("userId") || ""
       );
 
-      if (data?.data?.player1 === playerInfo.userId) {
+      if (data?.data?.player1?.userId === playerInfo.userId) {
         setPlayerInfo((prev) => ({
           ...prev,
           side: "w",
@@ -148,31 +171,31 @@ export const Chess = ({}) => {
         }));
       }
 
-      if (data?.data?.chessState) {
-        chess.load(data?.data?.chessState);
-        setFen(chess.fen());
+      // if (data?.data?.fen) {
+      //   chess.load(data?.data?.fen);
+      //   setFen(chess.fen());
 
-        if (chess.isGameOver()) {
-          // check if move led to "game over"
-          if (chess.isCheckmate()) {
-            // if reason for game over is a checkmate
-            // Set message to checkmate.
-            setOver(
-              `Checkmate! ${chess.turn() === "w" ? "black" : "white"} wins!`
-            );
-            // The winner is determined by checking which side made the last move
-          } else if (chess.isDraw()) {
-            // if it is a draw
-            setOver("Draw"); // set message to "Draw"
-          } else {
-            setOver("Game over");
-          }
-        }
-      }
+      //   if (chess.isGameOver()) {
+      //     // check if move led to "game over"
+      //     if (chess.isCheckmate()) {
+      //       // if reason for game over is a checkmate
+      //       // Set message to checkmate.
+      //       setOver(
+      //         `Checkmate! ${chess.turn() === "w" ? "black" : "white"} wins!`
+      //       );
+      //       // The winner is determined by checking which side made the last move
+      //     } else if (chess.isDraw()) {
+      //       // if it is a draw
+      //       setOver("Draw"); // set message to "Draw"
+      //     } else {
+      //       setOver("Game over");
+      //     }
+      //   }
+      // }
 
       router.replace(url.href);
     });
-  }, [playerInfo.userId, router, socket, chess]);
+  }, [playerInfo.userId, router, socket]);
 
   const joinGame = () => {
     // console.log("joining game");
@@ -209,32 +232,37 @@ export const Chess = ({}) => {
     //   socket.emit("move", move);
     //   handleMove(move);
     // }
-    const move = makeAMove(moveData);
+    // const move = makeAMove(moveData);
+
+    try {
+      // chess.move(moveData);
+
+      socket?.emit("update:chess", {
+        roomId: stateFromSocket?.roomId,
+        userId: searchParams.get("userId"),
+        move: moveData,
+        // chessState: chess.fen(),
+      });
+    } catch (e) {
+      return false;
+    }
 
     // illegal move
-    if (move === null) return false;
-
-    socket?.emit("update:chess", {
-      roomId: gameRoom.roomId,
-      player: searchParams.get("userId"),
-      move: moveData,
-      chessState: chess.fen(),
-    });
 
     return true;
   };
 
-  const isInGameRoom = gameRoom.roomId;
+  const isInGameRoom = stateFromSocket?.roomId;
 
-  const checkedSquare = // useMemo(
-    // () =>
-    chess
-      .board()
-      .flat()
-      .find(
-        (chessPiece) =>
-          chessPiece?.type === "k" && chessPiece?.color === chess.turn()
-      )?.square;
+  // const checkedSquare = // useMemo(
+  // () =>
+  // chess
+  //   .board()
+  //   .flat()
+  //   .find(
+  //     (chessPiece) =>
+  //       chessPiece?.type === "k" && chessPiece?.color === chess.turn()
+  //   )?.square;
   //   [chess]
   // );
 
@@ -255,7 +283,7 @@ export const Chess = ({}) => {
 
   return (
     <div className="grid place-items-center h-screen">
-      <StalemateDialog
+      {/* <StalemateDialog
         open={chess.isStalemate()}
         won={chess.turn() !== playerInfo.side}
       />
@@ -263,7 +291,7 @@ export const Chess = ({}) => {
         open={chess.isCheckmate()}
         // open={true}
         won={chess.turn() !== playerInfo.side}
-      />
+      /> */}
       <div className="w-[500px] relative">
         {over && (
           <div className="absolute inset-0 bg-black/40 z-10 grid place-items-center">
@@ -278,36 +306,53 @@ export const Chess = ({}) => {
         {isInGameRoom && (
           <Chessboard
             arePiecesDraggable={
-              !chess.isGameOver() || chess.turn() === playerInfo.side
+              // !chess.isGameOver() || chess.turn() === stateFromSocket?.turn
+              stateFromSocket?.turn === playerInfo.side
             }
-            position={fen}
+            position={stateFromSocket?.fen}
             onPieceDrop={handleDrop}
             boardWidth={500}
             showBoardNotation
             boardOrientation={playerInfo.side === "w" ? "white" : "black"}
             isDraggablePiece={({ piece }) => {
-              if (piece?.startsWith(playerInfo.side)) return true;
+              if (piece?.startsWith(stateFromSocket?.turn)) return true;
               return false;
             }}
-            customSquare={(props) => (
-              <CustomSquareRenderer
-                {...props}
-                isCheck={chess.isCheck()}
-                kingPosition={checkedSquare}
-              />
-            )}
+            // customSquare={(props) => (
+            //   <CustomSquareRenderer
+            //     {...props}
+            //     isCheck={chess.isCheck()}
+            //     kingPosition={checkedSquare}
+            //   />
+            // )}
           />
         )}
       </div>
       {isInGameRoom ? (
         <>
-          {!chess.isGameOver() && (
-            <>{chess.turn() === playerInfo.side ? "Your turn" : "Their turn"}</>
-          )}
+          {/* {!chess.isGameOver() && ( */}
+          <>
+            {stateFromSocket.turn === playerInfo.side
+              ? "Your turn"
+              : "Their turn"}
+          </>
+          {/* )} */}
         </>
       ) : (
         <div>
           <Button onClick={joinGame}>Join a game</Button>
+        </div>
+      )}
+      {isInGameRoom && (
+        <div>
+          <div>
+            Player 1{" "}
+            {stateFromSocket?.player1.isConnected ? "online" : "offline"}
+          </div>
+          <div>
+            Player 2{" "}
+            {stateFromSocket?.player2.isConnected ? "online" : "offline"}
+          </div>
         </div>
       )}
       <div>{/* <pre>{JSON.stringify(gameRoom, null, 2)}</pre> */}</div>
