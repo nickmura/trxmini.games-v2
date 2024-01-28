@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { CustomSquareProps } from "react-chessboard/dist/chessboard/types";
 
 export const Chess = ({}) => {
-  // const chess = useMemo(() => new ChessJS(), []); // <- 1
+  const chess = useMemo(() => new ChessJS(), []); // <- 1
   // const [fen, setFen] = useState(chess.fen()); // <- 2
   const [over, setOver] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null); // const [game, setGame] = useState(new Chess());
@@ -26,12 +26,16 @@ export const Chess = ({}) => {
   //   player2: "",
   // });
 
-  const [playerInfo, setPlayerInfo] = useState({
-    side: "w",
-    roomId: "",
-    userId: "",
-    username: "",
-  });
+  // const [playerInfo, setPlayerInfo] = useState({
+  //   side: "w",
+  //   roomId: "",
+  //   userId: "",
+  //   username: "",
+  // });
+
+  const [side, setSide] = useState<"w" | "b">("w");
+  const [roomId, setRoomId] = useState("");
+  const [userId, setUserId] = useState("");
 
   const [stateFromSocket, setStateFromSocket] = useState<{
     roomId: string;
@@ -138,11 +142,13 @@ export const Chess = ({}) => {
   }, [searchParams, socket]);
 
   useEffect(() => {
-    setPlayerInfo((prev) => ({
-      ...prev,
-      roomId: searchParams.get("roomId") || "",
-      userId: searchParams.get("userId") || "",
-    }));
+    // setPlayerInfo((prev) => ({
+    //   ...prev,
+    //   roomId: searchParams.get("roomId") || "",
+    //   userId: searchParams.get("userId") || "",
+    // }));
+    setRoomId(searchParams.get("roomId") || "");
+    setUserId(searchParams.get("userId") || "");
   }, [searchParams]);
 
   useEffect(() => {
@@ -156,19 +162,21 @@ export const Chess = ({}) => {
       url.searchParams.set("roomId", data?.data?.roomId);
       url.searchParams.set(
         "userId",
-        playerInfo.userId || url.searchParams.get("userId") || ""
+        userId || url.searchParams.get("userId") || ""
       );
 
-      if (data?.data?.player1?.userId === playerInfo.userId) {
-        setPlayerInfo((prev) => ({
-          ...prev,
-          side: "w",
-        }));
+      if (data?.data?.player1?.userId === userId) {
+        setSide("w");
+        // setPlayerInfo((prev) => ({
+        //   ...prev,
+        //   side: "w",
+        // }));
       } else {
-        setPlayerInfo((prev) => ({
-          ...prev,
-          side: "b",
-        }));
+        setSide("b");
+        // setPlayerInfo((prev) => ({
+        //   ...prev,
+        //   side: "b",
+        // }));
       }
 
       // if (data?.data?.fen) {
@@ -195,7 +203,7 @@ export const Chess = ({}) => {
 
       router.replace(url.href);
     });
-  }, [playerInfo.userId, router, socket]);
+  }, [router, socket, userId]);
 
   const joinGame = () => {
     // console.log("joining game");
@@ -207,10 +215,12 @@ export const Chess = ({}) => {
       } while (!userId);
     }
 
-    setPlayerInfo((prev) => ({
-      ...prev,
-      userId: userId!,
-    }));
+    setUserId(userId!);
+
+    // setPlayerInfo((prev) => ({
+    //   ...prev,
+    //   userId: userId!,
+    // }));
 
     socket?.emit("join:chess", { userId });
   };
@@ -233,6 +243,20 @@ export const Chess = ({}) => {
     //   handleMove(move);
     // }
     // const move = makeAMove(moveData);
+
+    try {
+      // console.log(stateFromSocket?.fen);
+      if (stateFromSocket?.fen) {
+        chess.load(stateFromSocket?.fen);
+        chess.move(moveData);
+        setStateFromSocket((prev) => {
+          if (!prev) return prev;
+          return { ...prev, fen: chess.fen() };
+        });
+      }
+    } catch (e) {
+      console.log(e, "err");
+    }
 
     try {
       // chess.move(moveData);
@@ -307,13 +331,13 @@ export const Chess = ({}) => {
           <Chessboard
             arePiecesDraggable={
               // !chess.isGameOver() || chess.turn() === stateFromSocket?.turn
-              stateFromSocket?.turn === playerInfo.side
+              stateFromSocket?.turn === side
             }
             position={stateFromSocket?.fen}
             onPieceDrop={handleDrop}
             boardWidth={500}
             showBoardNotation
-            boardOrientation={playerInfo.side === "w" ? "white" : "black"}
+            boardOrientation={side === "w" ? "white" : "black"}
             isDraggablePiece={({ piece }) => {
               if (piece?.startsWith(stateFromSocket?.turn)) return true;
               return false;
@@ -331,11 +355,7 @@ export const Chess = ({}) => {
       {isInGameRoom ? (
         <>
           {/* {!chess.isGameOver() && ( */}
-          <>
-            {stateFromSocket.turn === playerInfo.side
-              ? "Your turn"
-              : "Their turn"}
-          </>
+          <>{stateFromSocket.turn === side ? "Your turn" : "Their turn"}</>
           {/* )} */}
         </>
       ) : (
