@@ -6,7 +6,7 @@ import { LayoutWrapper } from "@/components/LayoutWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "",
+  title: "trxmini.games - a staking/wagering arcade GameFi platform",
   description: "",
 };
 
