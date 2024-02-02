@@ -32,6 +32,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useAtom } from "jotai";
+import { startGameDialogAtom } from "@/atoms/startGameDialog.atom";
 
 const formSchema = z.object({
   game: z.string({
@@ -53,13 +55,9 @@ const formSchema = z.object({
 //     return false;
 //   });
 
-export const StartGameDialog = ({
-  open,
-  setOpen,
-}: {
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-}) => {
+export const StartGameDialog = () => {
+  const [open, setOpen] = useAtom(startGameDialogAtom);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -76,7 +74,7 @@ export const StartGameDialog = ({
   }
 
   return (
-    <AlertDialog open={open}>
+    <AlertDialog open={open.isOpen}>
       <AlertDialogContent className="rounded-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle>Create a game</AlertDialogTitle>
@@ -121,7 +119,7 @@ export const StartGameDialog = ({
                 <FormItem className="mt-4">
                   <FormControl>
                     <Input
-                      placeholder="Enter your wager"
+                      placeholder="Enter your wager (in TRX)"
                       {...field}
                       autoFocus
                       type="number"
@@ -174,9 +172,18 @@ export const StartGameDialog = ({
               <AlertDialogAction type="submit">
                 Start a {form.watch("game")} game
               </AlertDialogAction>
-              <AlertDialogCancel onClick={() => setOpen(false)}>
-                Cancel
-              </AlertDialogCancel>
+              {open.isCloseable && (
+                <AlertDialogCancel
+                  onClick={() =>
+                    setOpen({
+                      isCloseable: false,
+                      isOpen: false,
+                    })
+                  }
+                >
+                  Cancel
+                </AlertDialogCancel>
+              )}
             </AlertDialogFooter>
           </form>
         </Form>

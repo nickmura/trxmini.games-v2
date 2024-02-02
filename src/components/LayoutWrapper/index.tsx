@@ -3,6 +3,7 @@
 import { atom, useAtom } from "jotai";
 import { ReactNode, useEffect } from "react";
 import { Socket, io } from "socket.io-client";
+import { Dialogs } from "../Dialogs";
 
 const _socketAtom = atom<Socket | null>(null);
 
@@ -29,5 +30,10 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
     };
   }, [setSocket]);
 
-  return <>{children}</>;
+  return (
+    <>
+      <Dialogs />
+      {children}
+    </>
+  );
 };

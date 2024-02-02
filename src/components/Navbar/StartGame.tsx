@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { StartGameDialog } from "../Dialogs/StartGameDialog";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -10,9 +8,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useAtom } from "jotai";
+import { startGameDialogAtom } from "@/atoms/startGameDialog.atom";
 
 export const StartGame = () => {
-  const [showStartGameDialog, setShowStartGameDialog] = useState(false);
+  const [, setShowStartGameDialog] = useAtom(startGameDialogAtom);
 
   return (
     <>
@@ -25,17 +25,13 @@ export const StartGame = () => {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
-              setShowStartGameDialog(true);
+              setShowStartGameDialog({ isCloseable: true, isOpen: true });
             }}
           >
             Start a game
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <StartGameDialog
-        open={showStartGameDialog}
-        setOpen={setShowStartGameDialog}
-      />
     </>
   );
 };
