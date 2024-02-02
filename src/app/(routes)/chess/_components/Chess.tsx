@@ -152,35 +152,35 @@ export const Chess = ({
             </div>
           </div>
         )}
-        {isInGameRoom && (
-          <Chessboard
-            arePiecesDraggable={
-              // !chess.isGameOver() || chess.turn() === stateFromSocket?.turn
-              stateFromSocket?.turn === side
-            }
-            position={stateFromSocket?.fen}
-            onPieceDrop={handleDrop}
-            boardWidth={500}
-            showBoardNotation
-            boardOrientation={side === "w" ? "white" : "black"}
-            isDraggablePiece={({ piece }) => {
-              if (piece?.startsWith(stateFromSocket?.turn)) return true;
-              return false;
-            }}
-            customSquareStyles={{
-              ...optionSquares,
-            }}
-            onSquareClick={getMoveOptions}
-            onPieceDragBegin={(p, s) => getMoveOptions(s)}
-            // customSquare={(props) => (
-            //   <CustomSquareRenderer
-            //     {...props}
-            //     isCheck={chess.isCheck()}
-            //     kingPosition={checkedSquare}
-            //   />
-            // )}
-          />
-        )}
+        {/* {isInGameRoom && ( */}
+        <Chessboard
+          arePiecesDraggable={
+            // !chess.isGameOver() || chess.turn() === stateFromSocket?.turn
+            stateFromSocket?.turn === side
+          }
+          position={stateFromSocket?.fen}
+          onPieceDrop={handleDrop}
+          boardWidth={500}
+          showBoardNotation
+          boardOrientation={side === "w" ? "white" : "black"}
+          isDraggablePiece={({ piece }) => {
+            if (piece?.startsWith(stateFromSocket?.turn || "")) return true;
+            return false;
+          }}
+          customSquareStyles={{
+            ...optionSquares,
+          }}
+          onSquareClick={getMoveOptions}
+          onPieceDragBegin={(p, s) => getMoveOptions(s)}
+          // customSquare={(props) => (
+          //   <CustomSquareRenderer
+          //     {...props}
+          //     isCheck={chess.isCheck()}
+          //     kingPosition={checkedSquare}
+          //   />
+          // )}
+        />
+        {/* )} */}
       </div>
       {isInGameRoom ? (
         <>
@@ -189,9 +189,8 @@ export const Chess = ({
           {/* )} */}
         </>
       ) : (
-        <div>
-          <Button onClick={joinGame}>Join a game</Button>
-        </div>
+        <></>
+        // <div>{/* <Button onClick={joinGame}>Join a game</Button> */}</div>
       )}
       {isInGameRoom && (
         <div>
@@ -205,7 +204,7 @@ export const Chess = ({
           </div>
         </div>
       )}
-      <div>{/* <pre>{JSON.stringify(gameRoom, null, 2)}</pre> */}</div>
+      {/* <div><pre>{JSON.stringify(gameRoom, null, 2)}</pre></div> */}
     </div>
   );
 };

@@ -8,6 +8,10 @@ import { useSocket } from "@/components/LayoutWrapper";
 import { useRouter } from "next/navigation";
 import { ISocketState } from "../types/index.types";
 import { ChatSidebar } from "./ChatSidebar";
+import { cn } from "@/lib/utils";
+import { StartGameDialog } from "@/components/Dialogs/StartGameDialog";
+import { useAtom } from "jotai";
+import { startGameDialogAtom } from "@/atoms/startGameDialog.atom";
 
 export const ChessGameWrapper = ({ children }: { children?: ReactNode }) => {
   const [side, setSide] = useState<"w" | "b">("w");
@@ -19,6 +23,9 @@ export const ChessGameWrapper = ({ children }: { children?: ReactNode }) => {
   const router = useRouter();
 
   const socket = useSocket();
+  const [, setShowStartGameDialog] = useAtom(startGameDialogAtom);
+
+  const isInGameRoom = stateFromSocket?.roomId;
 
   useEffect(() => {
     if (
@@ -72,18 +79,42 @@ export const ChessGameWrapper = ({ children }: { children?: ReactNode }) => {
     };
   }, [socket]);
 
+  useEffect(() => {
+    if (!isInGameRoom)
+      setShowStartGameDialog({
+        isCloseable: false,
+        isOpen: true,
+      });
+  }, [isInGameRoom, setShowStartGameDialog]);
+
   return (
-    <div className="flex justify-between p-8">
-      <GameInfoSidebar stateFromSocket={stateFromSocket} />
-      <div className="col-span-4">
-        <Chess
-          setStateFromSocket={setStateFromSocket}
-          setUserId={setUserId}
-          side={side}
-          stateFromSocket={stateFromSocket}
-        />
+    <>
+      <div
+        className={cn(
+          "flex p-8 h-screen min-h-screen max-h-screen"
+          // !isInGameRoom && "opacity-50"
+        )}
+      >
+        {/* <div></div> */}
+        {/* {stateFromSocket?.roomId && ( */}
+        <div className="basis-1/4">
+          <GameInfoSidebar stateFromSocket={stateFromSocket} />
+        </div>
+        {/* )} */}
+        <div className="basis-2/4">
+          <Chess
+            setStateFromSocket={setStateFromSocket}
+            setUserId={setUserId}
+            side={side}
+            stateFromSocket={stateFromSocket}
+          />
+        </div>
+        {/* {stateFromSocket?.roomId &&  */}
+        <div className="basis-1/4">
+          <ChatSidebar />
+        </div>
+        {/* } */}
       </div>
-      <ChatSidebar />
-    </div>
+    </>
   );
 };
