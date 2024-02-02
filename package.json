@@ -10,7 +10,12 @@
     "preinstall": "echo y | npx only-allow yarn"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.4",
     "@radix-ui/react-alert-dialog": "^1.0.5",
+    "@radix-ui/react-checkbox": "^1.0.4",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
     "chess.js": "^1.0.0-beta.7",
     "class-variance-authority": "^0.7.0",
@@ -21,9 +26,11 @@
     "react": "^18",
     "react-chessboard": "^4.3.4",
     "react-dom": "^18",
+    "react-hook-form": "^7.50.0",
     "socket.io-client": "^4.7.4",
     "tailwind-merge": "^2.2.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^20",
