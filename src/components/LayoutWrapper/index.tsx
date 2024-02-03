@@ -4,6 +4,9 @@ import { atom, useAtom } from "jotai";
 import { ReactNode, useEffect } from "react";
 import { Socket, io } from "socket.io-client";
 import { Dialogs } from "../Dialogs";
+import { useStore } from "@/store";
+import { ISocketState } from "@/app/(routes)/chess/types/index.types";
+import { useRouter } from "next/navigation";
 
 const _socketAtom = atom<Socket | null>(null);
 
@@ -13,22 +16,81 @@ export const useSocket = () => {
 };
 
 export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
-  const [, setSocket] = useAtom(_socketAtom);
+  const router = useRouter();
+
+  const [socket, setSocket] = useAtom(_socketAtom);
+  const { setChess, setSide } = useStore();
 
   useEffect(() => {
     const socket = io(process.env.SOCKET_URL!, {
-      // path: "/",
       transports: ["websocket"],
     });
 
     setSocket(socket);
 
-    // console.log(socket);
     return () => {
       socket.close();
       setSocket(null);
     };
   }, [setSocket]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket?.on(
+      "joined:chess",
+      (data: { message: string; data: ISocketState }) => {
+        setChess(data?.data);
+
+        const url = new URL(window.location.href);
+
+        const userId = url.searchParams.get("userId");
+
+        url.searchParams.set("roomId", data?.data?.roomId);
+
+        if (data?.data?.player1?.userId === userId) {
+          setSide("w");
+        } else {
+          setSide("b");
+        }
+
+        router.replace(url.toString());
+      }
+    );
+
+    return () => {
+      socket?.off("joined:chess");
+    };
+  }, [router, socket, setChess, setSide]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const url = new URL(window.location.href);
+
+    const userId = url.searchParams.get("userId");
+    const roomId = url.searchParams.get("roomId");
+
+    if (userId && roomId) {
+      //set chess to null if we are emitting join:chess:room to show loading spinner
+      setChess(null);
+      socket?.emit("join:chess:room", { roomId, userId });
+    } else {
+      // shows game join dialog on /chess route
+      setChess({} as ISocketState);
+    }
+  }, [socket, setChess]);
+
+  useEffect(() => {
+    socket?.on("update:chess", (data) => {
+      // console.log(data, "update:chess");
+      setChess(data);
+    });
+
+    return () => {
+      socket?.off("update:chess");
+    };
+  }, [socket, setChess]);
 
   return (
     <>

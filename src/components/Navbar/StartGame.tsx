@@ -10,11 +10,18 @@ import {
 } from "../ui/dropdown-menu";
 import { useAtom } from "jotai";
 import { startGameDialogAtom } from "@/atoms/startGameDialog.atom";
+import { useStore } from "@/store";
 
 export const StartGame = () => {
+  const { chess } = useStore();
   const [, setShowStartGameDialog] = useAtom(startGameDialogAtom);
 
-  return (
+  const isLoading = chess === null;
+  const isInGameRoom = chess?.roomId;
+
+  return isInGameRoom ? (
+    <Button disabled>In a game </Button>
+  ) : (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

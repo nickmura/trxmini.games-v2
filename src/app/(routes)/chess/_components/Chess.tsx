@@ -1,34 +1,15 @@
 "use client";
-import React, {
-  useState,
-  useMemo,
-  forwardRef,
-  CSSProperties,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import React, { useState, useMemo, forwardRef, CSSProperties } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess as ChessJS, Square } from "chess.js";
 import { useSearchParams } from "next/navigation";
-import { StalemateDialog } from "./StalemateDialog";
-import { CheckmateDialog } from "./CheckmateDialog";
 import { Button } from "@/components/ui/button";
 import { CustomSquareProps } from "react-chessboard/dist/chessboard/types";
 import { useSocket } from "@/components/LayoutWrapper";
-import { ISocketState } from "../types/index.types";
+import { useStore } from "@/store";
 
-export const Chess = ({
-  stateFromSocket,
-  setStateFromSocket,
-  setUserId,
-  side,
-}: {
-  stateFromSocket: ISocketState | undefined;
-  setStateFromSocket: Dispatch<SetStateAction<ISocketState | undefined>>;
-  setUserId: Dispatch<SetStateAction<string>>;
-  side: "w" | "b";
-}) => {
-  const chess = useMemo(() => new ChessJS(), []); // <- 1
+export const Chess = () => {
+  const chessJs = useMemo(() => new ChessJS(), []); // <- 1
   const [over, setOver] = useState("");
 
   const searchParams = useSearchParams();
@@ -36,20 +17,7 @@ export const Chess = ({
 
   const socket = useSocket();
 
-  const joinGame = () => {
-    // console.log("joining game");
-    let userId = searchParams.get("userId");
-
-    if (!userId) {
-      do {
-        userId = prompt("Enter a user id");
-      } while (!userId);
-    }
-
-    setUserId(userId!);
-
-    socket?.emit("join:chess", { userId });
-  };
+  const { side, chess, setChess } = useStore();
 
   const handleDrop = (sourceSquare: Square, targetSquare: Square) => {
     const moveData = {
@@ -60,13 +28,10 @@ export const Chess = ({
 
     try {
       // console.log(stateFromSocket?.fen);
-      if (stateFromSocket?.fen) {
-        chess.load(stateFromSocket?.fen);
-        chess.move(moveData);
-        setStateFromSocket((prev) => {
-          if (!prev) return prev;
-          return { ...prev, fen: chess.fen() };
-        });
+      if (chess?.fen) {
+        chessJs.load(chess?.fen);
+        chessJs.move(moveData);
+        setChess({ ...chess, fen: chessJs.fen() });
       }
     } catch (e) {
       console.log(e, "err");
@@ -74,7 +39,7 @@ export const Chess = ({
 
     try {
       socket?.emit("update:chess", {
-        roomId: stateFromSocket?.roomId,
+        roomId: chess?.roomId,
         userId: searchParams.get("userId"),
         move: moveData,
         // chessState: chess.fen(),
@@ -87,7 +52,7 @@ export const Chess = ({
   };
 
   function getMoveOptions(square: Square) {
-    const moves = chess.moves({
+    const moves = chessJs.moves({
       square,
       verbose: true,
     });
@@ -101,8 +66,8 @@ export const Chess = ({
     moves.map((move) => {
       newSquares[move.to] = {
         background:
-          chess.get(move.to) &&
-          chess.get(move.to).color !== chess.get(square).color
+          chessJs.get(move.to) &&
+          chessJs.get(move.to).color !== chessJs.get(square).color
             ? "radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)"
             : "radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)",
         borderRadius: "50%",
@@ -116,7 +81,8 @@ export const Chess = ({
     return true;
   }
 
-  const isInGameRoom = stateFromSocket?.roomId;
+  const isLoading = chess === null;
+  const isInGameRoom = chess?.roomId;
 
   // const checkedSquare = // useMemo(
   // () =>
@@ -152,19 +118,15 @@ export const Chess = ({
             </div>
           </div>
         )}
-        {/* {isInGameRoom && ( */}
         <Chessboard
-          arePiecesDraggable={
-            // !chess.isGameOver() || chess.turn() === stateFromSocket?.turn
-            stateFromSocket?.turn === side
-          }
-          position={stateFromSocket?.fen}
+          arePiecesDraggable={chess?.turn === side}
+          position={chess?.fen}
           onPieceDrop={handleDrop}
           boardWidth={500}
           showBoardNotation
           boardOrientation={side === "w" ? "white" : "black"}
           isDraggablePiece={({ piece }) => {
-            if (piece?.startsWith(stateFromSocket?.turn || "")) return true;
+            if (piece?.startsWith(chess?.turn || "")) return true;
             return false;
           }}
           customSquareStyles={{
@@ -180,30 +142,27 @@ export const Chess = ({
           //   />
           // )}
         />
-        {/* )} */}
       </div>
       {isInGameRoom ? (
         <>
           {/* {!chess.isGameOver() && ( */}
-          <>{stateFromSocket.turn === side ? "Your turn" : "Their turn"}</>
+          <>{chess.turn === side ? "Your turn" : "Their turn"}</>
           {/* )} */}
         </>
       ) : (
         <></>
         // <div>{/* <Button onClick={joinGame}>Join a game</Button> */}</div>
       )}
-      {isInGameRoom && (
+      {/* {isInGameRoom && (
         <div>
           <div>
-            Player 1{" "}
-            {stateFromSocket?.player1.isConnected ? "online" : "offline"}
+            Player 1 {chess?.player1.isConnected ? "online" : "offline"}
           </div>
           <div>
-            Player 2{" "}
-            {stateFromSocket?.player2.isConnected ? "online" : "offline"}
+            Player 2 {chess?.player2.isConnected ? "online" : "offline"}
           </div>
         </div>
-      )}
+      )} */}
       {/* <div><pre>{JSON.stringify(gameRoom, null, 2)}</pre></div> */}
     </div>
   );

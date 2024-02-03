@@ -2,29 +2,22 @@
 
 import { useSocket } from "@/components/LayoutWrapper";
 import { Button } from "@/components/ui/button";
-import { ISocketState } from "../types/index.types";
+import { useStore } from "@/store";
 
-export const GameInfoSidebar = ({
-  stateFromSocket,
-}: {
-  stateFromSocket: ISocketState | undefined;
-}) => {
+export const GameInfoSidebar = () => {
   const socket = useSocket();
+  const { chess } = useStore();
 
-  //   console.log(socket, "socket");
   return (
     <div className="flex flex-col justify-between col-span-1 border p-4 rounded-lg border-blue-500">
       <div>
         <p className="font-bold text-gray-700">
           {/* currently user id is shown but we will show username  */}
-          Players: {stateFromSocket?.player1?.userId}{" "}
-          {stateFromSocket?.player2?.userId}{" "}
+          Players: {chess?.player1?.userId} {chess?.player2?.userId}{" "}
         </p>
         <p>
           Current Turn:{" "}
-          {stateFromSocket?.player1?.side === stateFromSocket?.turn
-            ? "Yours"
-            : "Theirs"}
+          {chess?.player1?.side === chess?.turn ? "Yours" : "Theirs"}
         </p>
         <p>Stake: 0</p>
       </div>

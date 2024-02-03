@@ -8,7 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Label } from "../ui/label";
 import {
   Select,
@@ -34,6 +34,8 @@ import {
 } from "@/components/ui/form";
 import { useAtom } from "jotai";
 import { startGameDialogAtom } from "@/atoms/startGameDialog.atom";
+import { useSocket } from "../LayoutWrapper";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   game: z.string({
@@ -57,6 +59,11 @@ const formSchema = z.object({
 
 export const StartGameDialog = () => {
   const [open, setOpen] = useAtom(startGameDialogAtom);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
+
+  const socket = useSocket();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,7 +77,11 @@ export const StartGameDialog = () => {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    // console.log(values);
+    // socket?.emit("")
+    const userId = String(Math.random());
+    socket?.emit("join:chess", { userId });
+    router.push("/chess?userId=" + userId);
   }
 
   return (
