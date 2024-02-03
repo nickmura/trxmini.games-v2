@@ -34,9 +34,9 @@ export const ChessGameWrapper = () => {
 
   return (
     <>
-      <div className={"flex p-8 h-screen min-h-screen relative max-h-screen"}>
+      <div className={"flex py-8 relative"}>
         {isLoading && (
-          <div className="absolute bg-gray-400/40 z-10 inset-0 grid place-items-center">
+          <div className="fixed bg-gray-400/40 z-10 inset-0 grid place-items-center">
             <Spinner />
           </div>
         )}
