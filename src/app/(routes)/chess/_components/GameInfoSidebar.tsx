@@ -13,14 +13,15 @@ export const GameInfoSidebar = () => {
       <div>
         <p className="font-bold text-gray-700">
           {/* currently user id is shown but we will show username  */}
-          Players: {chess?.player1?.userId} {chess?.player2?.userId}{" "}
+          Players: {chess?.player1?.userId} & {chess?.player2?.userId}{" "}
         </p>
         <p>
-          Current Turn:{" "}
-          {chess?.player1?.side === chess?.turn ? "Yours" : "Theirs"}
+          Turn: {chess?.turn?.toUpperCase()}
+          {/* {chess?.player1?.side === chess?.turn ? "Yours" : "Theirs"} */}
         </p>
-        <p>Stake: 0</p>
+        <p>Stake: {chess?.stake}</p>
       </div>
+      <div className="h-10" />
       <div className="grid grid-cols-2 gap-2">
         <Button variant="default" size="sm" disabled>
           Collect win
