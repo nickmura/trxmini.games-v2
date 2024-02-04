@@ -1,4 +1,4 @@
-export const Spinner = () => {
+export const Spinner = ({ className = "" }: { className?: string }) => {
   return (
     <>
       <svg
@@ -7,6 +7,7 @@ export const Spinner = () => {
         height="96px"
         viewBox="0 0 100 100"
         preserveAspectRatio="xMidYMid"
+        className={className}
       >
         <g transform="rotate(0 50 50)">
           <rect

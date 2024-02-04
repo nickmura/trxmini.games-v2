@@ -1,19 +1,30 @@
 "use client";
 
-import { atom, useAtom } from "jotai";
+import { Provider, atom, useAtom } from "jotai";
 import { ReactNode, useEffect } from "react";
 import { Socket, io } from "socket.io-client";
 import { Dialogs } from "../Dialogs";
 import { useStore } from "@/store";
 import { ISocketState } from "@/app/(routes)/chess/types/index.types";
 import { useRouter, useSearchParams } from "next/navigation";
-import toast, { Toaster, useToaster, useToasterStore } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
+import { jotaiStore } from "@/atoms";
 
 const _socketAtom = atom<Socket | null>(null);
+const _userIdAtom = atom<string | null | undefined | number>(undefined);
 
 export const useSocket = () => {
   const [socket] = useAtom(_socketAtom);
   return socket;
+};
+
+/**
+ * @desc temporary hook to get a non changing userId stored in browser's localstorage
+ * @returns {String} userid of current user
+ */
+export const useUserId = () => {
+  const [userId] = useAtom(_userIdAtom);
+  return userId;
 };
 
 export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
@@ -21,7 +32,24 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   const searchParams = useSearchParams();
 
   const [socket, setSocket] = useAtom(_socketAtom);
+  const [userId, setUserId] = useAtom(_userIdAtom);
   const { setChess, setSide } = useStore();
+
+  useEffect(() => {
+    console.log("ran");
+    const storedUserId = localStorage?.getItem("__temp__trxmini.games--userId");
+
+    if (storedUserId === null) {
+      const generatedUserId = Math.floor(Math.random() * 1_000_000_000 + 1);
+      localStorage.setItem(
+        "__temp__trxmini.games--userId",
+        generatedUserId as unknown as string
+      );
+      setUserId(generatedUserId);
+    } else {
+      setUserId(storedUserId);
+    }
+  }, [setUserId]);
 
   useEffect(() => {
     const socket = io(process.env.SOCKET_URL!, {
@@ -37,6 +65,7 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   }, [setSocket]);
 
   useEffect(() => {
+    // console.log(socket, "socket");
     if (!socket) return;
 
     socket?.on(
@@ -117,9 +146,11 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
 
   return (
     <>
+      {/* <Provider store={jotaiStore}> */}
       <Toaster />
       <Dialogs />
       {children}
+      {/* </Provider> */}
     </>
   );
 };

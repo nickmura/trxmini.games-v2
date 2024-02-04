@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/form";
 import { useAtom } from "jotai";
 import { startGameDialogAtom } from "@/atoms/startGameDialog.atom";
-import { useSocket } from "../LayoutWrapper";
+import { useSocket, useUserId } from "../LayoutWrapper";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -66,6 +66,8 @@ export const StartGameDialog = () => {
 
   const socket = useSocket();
 
+  const userId = useUserId();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -78,9 +80,9 @@ export const StartGameDialog = () => {
 
     toast.loading("Creating a chess room...", { id: "create:chess-room" });
 
-    const userId = String(Math.random());
+    // const userId = String(Math.floor(Math.random() * 1_000_000 + 1));
     socket?.emit("create:chess-room", { userId, stake: values.wager });
-    router.push("/chess?userId=" + userId);
+    router.replace("/chess?userId=" + userId);
   };
 
   return (
