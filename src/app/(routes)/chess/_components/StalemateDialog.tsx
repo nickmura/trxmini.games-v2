@@ -29,7 +29,7 @@ export const StalemateDialog = ({
           <AlertDialogDescription>Good game!</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogAction onClick={() => router.push("/games/chess")}>
+          <AlertDialogAction onClick={() => router.push("/chess")}>
             Okay
           </AlertDialogAction>
         </AlertDialogFooter>

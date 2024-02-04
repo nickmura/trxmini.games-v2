@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { CustomSquareProps } from "react-chessboard/dist/chessboard/types";
 import { useSocket } from "@/components/LayoutWrapper";
 import { useStore } from "@/store";
+import { StalemateDialog } from "./StalemateDialog";
+import { CheckmateDialog } from "./CheckmateDialog";
 
 export const Chess = () => {
   const chessJs = useMemo(() => new ChessJS(), []); // <- 1
@@ -86,6 +88,26 @@ export const Chess = () => {
   const isLoading = chess === null;
   const isInGameRoom = chess?.roomId;
 
+  const isCheckmate = useMemo(() => {
+    if (chess?.fen) {
+      // console.log(chess, chess?.fen);
+      chessJs.load(chess?.fen!);
+
+      return chessJs.isCheckmate();
+    }
+
+    return false;
+  }, [chessJs, chess?.fen]);
+
+  const isStaleMate = useMemo(() => {
+    if (chess?.fen) {
+      chessJs.load(chess?.fen!);
+
+      return chessJs.isStalemate();
+    }
+    return false;
+  }, [chessJs, chess?.fen]);
+
   // const checkedSquare = // useMemo(
   // () =>
   // chess
@@ -102,15 +124,12 @@ export const Chess = () => {
 
   return (
     <div className="grid place-items-center">
-      {/* <StalemateDialog
-        open={chess.isStalemate()}
-        won={chess.turn() !== playerInfo.side}
-      />
+      <StalemateDialog open={isStaleMate} won={chess?.turn !== side} />
       <CheckmateDialog
-        open={chess.isCheckmate()}
+        open={isCheckmate}
         // open={true}
-        won={chess.turn() !== playerInfo.side}
-      /> */}
+        won={chess?.turn !== side}
+      />
       <div className="w-[520px] h-[520px] grid place-items-center bg-gradient-to-br from-[#D0A97A] via-[#D0A97A] to-[#A37C4D] relative rounded-lg">
         {over && (
           <div className="absolute inset-0 bg-black/40 z-10 grid place-items-center">
