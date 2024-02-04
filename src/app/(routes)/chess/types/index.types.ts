@@ -15,3 +15,10 @@ export type ISocketState = {
   stake: number;
   onlineCount: number;
 };
+
+export type IChat = {
+  id: string;
+  sender: string | number;
+  message: string;
+  date: string;
+};
