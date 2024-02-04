@@ -8,7 +8,6 @@ import { useStore } from "@/store";
 import { ISocketState } from "@/app/(routes)/chess/types/index.types";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
-import { jotaiStore } from "@/atoms";
 
 const _socketAtom = atom<Socket | null>(null);
 const _userIdAtom = atom<string | null | undefined | number>(undefined);

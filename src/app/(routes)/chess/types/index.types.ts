@@ -12,4 +12,6 @@ export type ISocketState = {
   };
   fen: string;
   turn: "w" | "b";
+  stake: number;
+  onlineCount: number;
 };
