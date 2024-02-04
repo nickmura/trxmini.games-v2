@@ -7,6 +7,8 @@ export interface ChessSlice {
   setSide: (data: ChessSlice["side"]) => void;
   chess: ISocketState | null;
   setChess: (data: ChessSlice["chess"]) => void;
+  chessLobby: Array<ISocketState> | null;
+  setChessLobby: (data: ChessSlice["chessLobby"]) => void;
   leaveChessRoom: () => void;
   updateChessRoom: () => void;
 }
@@ -21,6 +23,10 @@ export const createChessSlice: StateCreator<ChessSlice, [], [], ChessSlice> = (
   chess: null,
   setChess: (chess) => {
     set((state) => ({ ...state, chess }));
+  },
+  chessLobby: null,
+  setChessLobby: (chessLobby) => {
+    set((state) => ({ ...state, chessLobby }));
   },
   // socket?.emit("chess:join", data);
   leaveChessRoom: () => {}, //set((state) => ({ fishes: state.fishes - 1 })),
