@@ -36,6 +36,7 @@ import { useAtom } from "jotai";
 import { startGameDialogAtom } from "@/atoms/startGameDialog.atom";
 import { useSocket } from "../LayoutWrapper";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   game: z.string({
@@ -69,20 +70,18 @@ export const StartGameDialog = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       game: "chess",
-      //   wager: 100,
-      //   wagerless: false,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    // console.log(values);
-    // socket?.emit("")
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+
+    toast.loading("Creating a chess room...", { id: "create:chess-room" });
+
     const userId = String(Math.random());
-    socket?.emit("join:chess", { userId });
+    socket?.emit("create:chess-room", { userId, stake: values.wager });
     router.push("/chess?userId=" + userId);
-  }
+  };
 
   return (
     <AlertDialog open={open.isOpen}>
@@ -180,7 +179,7 @@ export const StartGameDialog = () => {
               )}
             /> */}
             <AlertDialogFooter className="mt-4">
-              <AlertDialogAction type="submit">
+              <AlertDialogAction type="submit" disabled={isLoading}>
                 Start a {form.watch("game")} game
               </AlertDialogAction>
               {open.isCloseable && (
