@@ -52,6 +52,8 @@ export const Chess = () => {
   };
 
   function getMoveOptions(square: Square) {
+    if (chess?.turn !== side) return;
+
     const moves = chessJs.moves({
       square,
       verbose: true,
@@ -96,6 +98,8 @@ export const Chess = () => {
   //   [chess]
   // );
 
+  // console.log(chess, "chess");
+
   return (
     <div className="grid place-items-center">
       {/* <StalemateDialog
@@ -107,7 +111,7 @@ export const Chess = () => {
         // open={true}
         won={chess.turn() !== playerInfo.side}
       /> */}
-      <div className="w-[500px] relative">
+      <div className="w-[520px] h-[520px] grid place-items-center bg-gradient-to-br from-[#D0A97A] via-[#D0A97A] to-[#A37C4D] relative rounded-lg">
         {over && (
           <div className="absolute inset-0 bg-black/40 z-10 grid place-items-center">
             <div className="font-bold text-white">
@@ -118,30 +122,36 @@ export const Chess = () => {
             </div>
           </div>
         )}
-        <Chessboard
-          arePiecesDraggable={chess?.turn === side}
-          position={chess?.fen}
-          onPieceDrop={handleDrop}
-          boardWidth={500}
-          showBoardNotation
-          boardOrientation={side === "w" ? "white" : "black"}
-          isDraggablePiece={({ piece }) => {
-            if (piece?.startsWith(chess?.turn || "")) return true;
-            return false;
-          }}
-          customSquareStyles={{
-            ...optionSquares,
-          }}
-          onSquareClick={getMoveOptions}
-          onPieceDragBegin={(p, s) => getMoveOptions(s)}
-          // customSquare={(props) => (
-          //   <CustomSquareRenderer
-          //     {...props}
-          //     isCheck={chess.isCheck()}
-          //     kingPosition={checkedSquare}
-          //   />
-          // )}
-        />
+        <div className="">
+          <Chessboard
+            arePiecesDraggable={chess?.turn === side}
+            position={chess?.fen}
+            onPieceDrop={handleDrop}
+            boardWidth={500}
+            showBoardNotation
+            boardOrientation={side === "w" ? "white" : "black"}
+            isDraggablePiece={({ piece }) => {
+              if (piece?.startsWith(chess?.turn || "")) return true;
+              return false;
+            }}
+            customSquareStyles={{
+              ...optionSquares,
+            }}
+            onSquareClick={getMoveOptions}
+            onPieceDragBegin={(p, s) => getMoveOptions(s)}
+            onPieceClick={(p) => {
+              console.log(p);
+            }}
+
+            // customSquare={(props) => (
+            //   <CustomSquareRenderer
+            //     {...props}
+            //     isCheck={chess.isCheck()}
+            //     kingPosition={checkedSquare}
+            //   />
+            // )}
+          />
+        </div>
       </div>
       {isInGameRoom ? (
         <>
