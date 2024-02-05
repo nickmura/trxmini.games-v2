@@ -124,7 +124,11 @@ export const Chess = () => {
 
   return (
     <div className="grid place-items-center">
-      <StalemateDialog open={isStaleMate} won={chess?.turn !== side} />
+      <StalemateDialog
+        open={isStaleMate}
+        // open={true}
+        won={chess?.turn !== side}
+      />
       <CheckmateDialog
         open={isCheckmate}
         // open={true}
