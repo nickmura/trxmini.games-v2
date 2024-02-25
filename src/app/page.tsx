@@ -7,18 +7,18 @@ export default function Home() {
       {/* <Navbar /> */}
       <div className="flex =bg-red-500 h-full py-16">
         <div className="basis-1/2">
-          <div className="text-lg text-gray-500 font-medium">
+          <div className="text-lg text-gray-400 font-medium">
             trxmini.games presents
           </div>
           <div className="mt-4 bg-gradient-to-t from-blue-400 to-blue-600 text-4xl font-black text-transparent bg-clip-text leading-snug tracking-normal">
             The First Multiplayer GameFi Mini Games/eSports platform on TRON &
             BTTC
           </div>
-          <div className="mt-6">
+          <div className="mt-2 text-gray-600">
             trxmini.games is a new multiplayer GameFi platform in beta providing
             and developing various minigames to play against your friends and
             users online.
-            <span className="text-gray-600">
+            <span className="">
               Players can stake and wager against each other in our catalog of
               turn based, real time and upcoming existing games.
             </span>

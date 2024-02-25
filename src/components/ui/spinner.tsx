@@ -17,7 +17,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -37,7 +37,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -57,7 +57,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -77,7 +77,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -97,7 +97,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -117,7 +117,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -137,7 +137,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -157,7 +157,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -177,7 +177,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -197,7 +197,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -217,7 +217,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"
@@ -237,7 +237,7 @@ export const Spinner = ({ className = "" }: { className?: string }) => {
             ry="2.66"
             width="5"
             height="14"
-            fill="#000000"
+            fill="currentColor"
           >
             <animate
               attributeName="opacity"

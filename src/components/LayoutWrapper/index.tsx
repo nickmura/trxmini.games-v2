@@ -8,6 +8,7 @@ import { useStore } from "@/store";
 import { ISocketState } from "@/app/(routes)/chess/types/index.types";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+import { getUserSessionData } from "@/lib/getUserSessionData";
 
 const _socketAtom = atom<Socket | null>(null);
 const _userIdAtom = atom<string | null | undefined | number>(undefined);
@@ -32,7 +33,10 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
 
   const [socket, setSocket] = useAtom(_socketAtom);
   const [userId, setUserId] = useAtom(_userIdAtom);
-  const { setChess, setSide } = useStore();
+  const { setChess, setSide, setUserSession, setUserSessionStatus } =
+    useStore();
+
+  // useAuth();
 
   useEffect(() => {
     console.log("ran");
@@ -142,6 +146,21 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
       socket?.off("update:chess");
     };
   }, [socket, setChess]);
+
+  useEffect(() => {
+    // check if current user is loggedin
+    // and set session data & status accordingly
+    (async () => {
+      const data = await getUserSessionData();
+      setUserSession(data);
+
+      if (data) {
+        setUserSessionStatus("authenticated");
+      } else {
+        setUserSessionStatus("unauthenticated");
+      }
+    })();
+  }, [setUserSessionStatus, setUserSession]);
 
   return (
     <>
