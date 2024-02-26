@@ -33,7 +33,7 @@ export const StartGame = () => {
       <div className="flex gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button>
+            <Button disabled={userSessionStatus === "loading"}>
               {userSessionStatus === "loading" ? (
                 <span>
                   <Spinner className="fill-white h-10 stroke-1" />
@@ -47,12 +47,12 @@ export const StartGame = () => {
             {isAuthenticated ? (
               <>
                 <p
-                  title={userSession?.walletAddress}
+                  title={userSession?.id}
                   className="text-sm px-2 py-1 font-semibold text-gray-400 m"
                 >
-                  {userSession?.walletAddress.slice(0, 6)}
+                  {userSession?.id.slice(0, 6)}
                   ...
-                  {userSession?.walletAddress.slice(-6)}
+                  {userSession?.id.slice(-6)}
                 </p>
               </>
             ) : (

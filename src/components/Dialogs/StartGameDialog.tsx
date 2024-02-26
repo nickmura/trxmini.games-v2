@@ -34,9 +34,10 @@ import {
 } from "@/components/ui/form";
 import { useAtom } from "jotai";
 import { startGameDialogAtom } from "@/atoms/startGameDialog.atom";
-import { useSocket, useUserId } from "../LayoutWrapper";
+import { useSocket } from "../LayoutWrapper";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useStore } from "@/store";
 
 const formSchema = z.object({
   game: z.string({
@@ -64,9 +65,11 @@ export const StartGameDialog = () => {
 
   const router = useRouter();
 
+  const { userSession } = useStore();
+
   const socket = useSocket();
 
-  const userId = useUserId();
+  const userId = userSession?.id; // useUserId();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

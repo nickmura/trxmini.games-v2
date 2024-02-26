@@ -1,6 +1,6 @@
 "use client";
 
-import { useSocket, useUserId } from "@/components/LayoutWrapper";
+import { useSocket } from "@/components/LayoutWrapper";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useStore } from "@/store";
@@ -12,12 +12,12 @@ export const ChessLobby = () => {
 
   const router = useRouter();
 
-  const { chessLobby } = useStore();
+  const { chessLobby, userSession } = useStore();
 
   const isLoading = chessLobby === null;
   const isLobbyEmpty = chessLobby?.length === 0;
 
-  const userId = useUserId();
+  const userId = userSession?.id; // useUserId();
   const socket = useSocket();
 
   const handleJoinRoom = (roomId: string) => {
@@ -28,7 +28,7 @@ export const ChessLobby = () => {
       userId,
     });
 
-    router.replace(`/chess?userId=${userId}&roomId=${roomId}`);
+    router.replace(`/chess/${roomId}`);
   };
 
   return (

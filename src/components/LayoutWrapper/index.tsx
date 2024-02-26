@@ -6,12 +6,17 @@ import { Socket, io } from "socket.io-client";
 import { Dialogs } from "../Dialogs";
 import { useStore } from "@/store";
 import { ISocketState } from "@/app/(routes)/chess/types/index.types";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { getUserSessionData } from "@/lib/getUserSessionData";
 
 const _socketAtom = atom<Socket | null>(null);
-const _userIdAtom = atom<string | null | undefined | number>(undefined);
+// const _userIdAtom = atom<string | null | undefined | number>(undefined);
 
 export const useSocket = () => {
   const [socket] = useAtom(_socketAtom);
@@ -22,37 +27,46 @@ export const useSocket = () => {
  * @desc temporary hook to get a non changing userId stored in browser's localstorage
  * @returns {String} userid of current user
  */
-export const useUserId = () => {
-  const [userId] = useAtom(_userIdAtom);
-  return userId;
-};
+// export const useUserId = () => {
+//   const [userId] = useAtom(_userIdAtom);
+//   return userId;
+// };
 
 export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  // const pathname = usePathname();
+  const params = useParams();
+
+  // console.log(params);
 
   const [socket, setSocket] = useAtom(_socketAtom);
-  const [userId, setUserId] = useAtom(_userIdAtom);
-  const { setChess, setSide, setUserSession, setUserSessionStatus } =
-    useStore();
+  // const [userId, setUserId] = useAtom(_userIdAtom);
+  const {
+    userSession,
+    setChess,
+    setSide,
+    setUserSession,
+    setUserSessionStatus,
+  } = useStore();
 
   // useAuth();
 
-  useEffect(() => {
-    console.log("ran");
-    const storedUserId = localStorage?.getItem("__temp__trxmini.games--userId");
+  // useEffect(() => {
+  //   console.log("ran");
+  //   const storedUserId = localStorage?.getItem("__temp__trxmini.games--userId");
 
-    if (storedUserId === null) {
-      const generatedUserId = Math.floor(Math.random() * 1_000_000_000 + 1);
-      localStorage.setItem(
-        "__temp__trxmini.games--userId",
-        generatedUserId as unknown as string
-      );
-      setUserId(generatedUserId);
-    } else {
-      setUserId(storedUserId);
-    }
-  }, [setUserId]);
+  //   if (storedUserId === null) {
+  //     const generatedUserId = Math.floor(Math.random() * 1_000_000_000 + 1);
+  //     localStorage.setItem(
+  //       "__temp__trxmini.games--userId",
+  //       generatedUserId as unknown as string
+  //     );
+  //     setUserId(generatedUserId);
+  //   } else {
+  //     setUserId(storedUserId);
+  //   }
+  // }, [setUserId]);
 
   useEffect(() => {
     const socket = io(process.env.SOCKET_URL!, {
@@ -77,8 +91,9 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
         toast.dismiss("create:chess-room");
         toast.success(data.message);
 
-        const url = new URL(window.location.href);
-        url.searchParams.set("roomId", data.data.roomId);
+        const url = new URL(window.location.origin);
+        url.pathname = `/chess/${data.data.roomId}`;
+        // url.searchParams.set("roomId", data.data.roomId);
 
         router.push(url.toString());
       }
@@ -97,11 +112,13 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
       (data: { message: string; data: ISocketState }) => {
         setChess(data?.data);
 
-        const url = new URL(window.location.href);
+        // const url = new URL(window.location.href);
+        const url = new URL(window.location.origin);
+        url.pathname = `/chess/${data.data.roomId}`;
 
-        const userId = url.searchParams.get("userId");
+        const userId = userSession?.id; // url.searchParams.get("userId");
 
-        url.searchParams.set("roomId", data?.data?.roomId);
+        // url.searchParams.set("roomId", data?.data?.roomId);
 
         if (data?.data?.player1?.userId === userId) {
           setSide("w");
@@ -116,15 +133,15 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
     return () => {
       socket?.off("joined:chess");
     };
-  }, [router, socket, setChess, setSide]);
+  }, [router, socket, userSession?.id, setChess, setSide]);
 
   useEffect(() => {
     if (!socket) return;
 
     // const url = new URL(window.location.href);
 
-    const userId = searchParams.get("userId");
-    const roomId = searchParams.get("roomId");
+    const userId = userSession?.id; // searchParams.get("userId");
+    const roomId = params.roomId;
 
     if (userId && roomId) {
       //set chess to null if we are emitting join:chess:room to show loading spinner
@@ -134,7 +151,7 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
       // shows game join dialog on /chess route
       setChess({} as ISocketState);
     }
-  }, [socket, setChess, searchParams]);
+  }, [socket, userSession?.id, setChess, searchParams, params.roomId]);
 
   useEffect(() => {
     socket?.on("update:chess", (data) => {

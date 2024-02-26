@@ -2,17 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import moment from "moment";
-import { useSocket, useUserId } from "@/components/LayoutWrapper";
+import { useSocket } from "@/components/LayoutWrapper";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/store";
 
 export const ChatSidebar = () => {
   const [message, setMessage] = useState("");
-  const { chats, setChats, chess } = useStore();
+  const { chats, setChats, chess, userSession } = useStore();
 
   const lastMessageRef = useRef<HTMLDivElement>(null);
 
-  const userId = useUserId();
+  const userId = userSession?.id; // useUserId();
   const socket = useSocket();
 
   const scrollToLatestChat = () => {
