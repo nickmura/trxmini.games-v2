@@ -72,22 +72,28 @@ export const SetNicknameDialog = () => {
         isOpen: false,
       });
       return toast.success(
-        `Successfully set your username to ${json.nickname}`
+        `Successfully set your nickname to ${json.nickname}`
       );
     }
 
     toast.error(
-      `Couldn't set your username currently. Please try again later!`
+      `Couldn't set your nickname currently. Please try again later!`
     );
     setIsLoading(false);
   };
 
   useEffect(() => {
-    // console.log(userSession?.username, "here");
-    if (userSession && !userSession?.username) {
+    if (userSession === null) return;
+
+    if (!userSession?.nickname) {
       setOpen({
         isCloseable: false,
         isOpen: true,
+      });
+    } else {
+      setOpen({
+        isCloseable: false,
+        isOpen: false,
       });
     }
   }, [setOpen, userSession]);

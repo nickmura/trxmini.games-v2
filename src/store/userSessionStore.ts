@@ -3,7 +3,7 @@ import { StateCreator } from "zustand";
 export interface UserSessionSlice {
   userSession: {
     id: string;
-    username: null | string;
+    nickname: null | string;
     createdAt: Date;
   } | null;
   userSessionStatus: "loading" | "authenticated" | "unauthenticated";
