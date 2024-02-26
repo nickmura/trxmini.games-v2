@@ -83,9 +83,7 @@ export const StartGameDialog = () => {
 
     toast.loading("Creating a chess room...", { id: "create:chess-room" });
 
-    // const userId = String(Math.floor(Math.random() * 1_000_000 + 1));
     socket?.emit("create:chess-room", { userId, stake: values.wager });
-    router.replace("/chess?userId=" + userId);
   };
 
   return (
