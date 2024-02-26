@@ -3,6 +3,7 @@
 import { useSocket } from "@/components/LayoutWrapper";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/store";
+import Link from "next/link";
 
 export const GameInfoSidebar = () => {
   const socket = useSocket();
@@ -30,7 +31,7 @@ export const GameInfoSidebar = () => {
           Collect draw
         </Button>
         <Button variant="destructive" size="sm">
-          Leave Game
+          <Link href="/">Leave Game</Link>
         </Button>
         <Button variant="secondary" disabled>
           Avert Game
