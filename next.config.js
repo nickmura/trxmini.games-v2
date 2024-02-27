@@ -1,8 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
-    SOCKET_URL: "http://localhost:5000",
-    BACKEND_API_URL_BASE: "http://localhost:5000",
+    SOCKET_URL:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:5000"
+        : "https://squid-app-cwhr6.ondigitalocean.app",
+    BACKEND_API_URL_BASE:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:5000"
+        : "https://squid-app-cwhr6.ondigitalocean.app",
   },
 };
 
