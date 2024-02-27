@@ -86,7 +86,9 @@ export const ChatSidebar = () => {
                     : "bg-gray-200 rounded-bl-none"
                 )}
               >
-                <div className="text-gray-500 text-sm">{chat.sender}</div>
+                <div className="text-gray-500 text-sm max-w-[15ch] text-ellipsis overflow-hidden">
+                  {chat.sender}
+                </div>
                 <div className="font-semibold text-gray-700">
                   {chat.message}
                 </div>
