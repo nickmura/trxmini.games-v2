@@ -19,7 +19,9 @@ export const Chess = () => {
 
   const socket = useSocket();
 
-  const { side, chess, setChess } = useStore();
+  const { side, chess, setChess, userSession } = useStore();
+
+  const userId = userSession?.id;
 
   const handleDrop = (sourceSquare: Square, targetSquare: Square) => {
     const moveData = {
@@ -42,7 +44,7 @@ export const Chess = () => {
     try {
       socket?.emit("update:chess", {
         roomId: chess?.roomId,
-        userId: searchParams.get("userId"),
+        userId: userId,
         move: moveData,
         // chessState: chess.fen(),
       });
