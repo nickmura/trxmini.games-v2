@@ -1,12 +1,17 @@
 import { Bell, Sun } from "lucide-react";
 import { Button } from "../ui/button";
 import { StartGame } from "./StartGame";
+import Link from "next/link";
 
 export const Navbar = () => {
   return (
     <nav className="flex justify-between items-center h-16 =bg-red-500">
       <div>
-        <p className="text-lg italic text-blue-500">trxmini.games</p>
+        <Link href="/">
+          <span className="text-lg block italic text-blue-500">
+            trxmini.games
+          </span>
+        </Link>
       </div>
       <div className="flex gap-4">
         <a href="#" className="cursor-not-allowed opacity-50">
@@ -26,13 +31,13 @@ export const Navbar = () => {
         </a>
       </div>
       <div className="flex items-center justify-between gap-4">
-        <button className="cursor-not-allowed opacity-50">
+        {/* <button className="cursor-not-allowed opacity-50">
           <Bell />
-        </button>
+        </button> */}
         <StartGame />
-        <button className="cursor-not-allowed opacity-50">
+        {/* <button className="cursor-not-allowed opacity-50">
           <Sun />
-        </button>
+        </button> */}
       </div>
     </nav>
   );

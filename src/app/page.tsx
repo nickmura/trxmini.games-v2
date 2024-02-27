@@ -5,7 +5,7 @@ export default function Home() {
     <>
       {/* <main className="min-h-screen max-h-screen w-11/12 mx-auto lg:max-w-screen-xl"> */}
       {/* <Navbar /> */}
-      <div className="flex =bg-red-500 h-full py-16">
+      <div className="flex items-center =bg-red-500 h-full py-16">
         <div className="basis-1/2">
           <div className="text-lg text-gray-400 font-medium">
             trxmini.games presents
