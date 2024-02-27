@@ -57,12 +57,16 @@ export const ChessLobby = () => {
                 <p className="font-semibold text-lg">{room.stake || "-"}</p>
               </div>
               <div>
-                <Button
-                  disabled={isJoiningRoom || isInRoom}
-                  onClick={() => handleJoinRoom(room.roomId)}
-                >
-                  Join
-                </Button>
+                {userId ? (
+                  <Button
+                    disabled={isJoiningRoom || isInRoom}
+                    onClick={() => handleJoinRoom(room.roomId)}
+                  >
+                    Join
+                  </Button>
+                ) : (
+                  <Button disabled> Login to join</Button>
+                )}
               </div>
             </div>
           );
