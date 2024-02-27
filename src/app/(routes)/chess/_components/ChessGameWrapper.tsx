@@ -12,9 +12,9 @@ import { Spinner } from "@/components/ui/spinner";
 export const ChessGameWrapper = () => {
   const [, setShowStartGameDialog] = useAtom(startGameDialogAtom);
 
-  const { chess } = useStore();
+  const { chess, userSessionStatus } = useStore();
 
-  const isLoading = chess === null;
+  const isLoading = chess === null || userSessionStatus === "loading";
   const isInGameRoom = chess?.roomId;
 
   useEffect(() => {
