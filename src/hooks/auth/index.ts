@@ -7,9 +7,11 @@ import { useEffect } from "react";
 import toast from "react-hot-toast";
 
 export const useAuth = () => {
-  const { setUserSession, setUserSessionStatus } = useStore();
+  const { setUserSession, setUserSessionStatus, setAuthToken } = useStore();
 
   const signIn = async () => {
+    setUserSessionStatus("loading");
+
     try {
       const connected = (await connectTronWallet()) as {
         walletAddress: string;
@@ -26,8 +28,9 @@ export const useAuth = () => {
 
         const response = await loginWithAddress(connected.walletAddress);
 
-        if (response.status === 201) {
-          const sessionData = await getUserSessionData();
+        if (response) {
+          setAuthToken(response);
+          const sessionData = await getUserSessionData(response);
 
           if (sessionData) {
             setUserSession(sessionData);

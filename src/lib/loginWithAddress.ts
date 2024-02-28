@@ -1,5 +1,5 @@
 export const loginWithAddress = async (walletAddress: string) => {
-  return await fetch(`${process.env.BACKEND_API_URL_BASE}/auth/login`, {
+  const res = await fetch(`${process.env.BACKEND_API_URL_BASE}/auth/login`, {
     method: "POST",
     body: JSON.stringify({
       username: walletAddress,
@@ -10,4 +10,14 @@ export const loginWithAddress = async (walletAddress: string) => {
     },
     credentials: "include",
   });
+
+  const json = await res.json();
+
+  // console.log(json, "json");
+
+  if (json?.token) {
+    return json?.token;
+  }
+
+  return null;
 };

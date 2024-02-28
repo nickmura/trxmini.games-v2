@@ -1,9 +1,12 @@
-export const getUserSessionData = async () => {
+export const getUserSessionData = async (bearerToken: string) => {
   try {
     const response = await fetch(
       `${process.env.BACKEND_API_URL_BASE}/auth/me`,
       {
         credentials: "include",
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
       }
     );
 

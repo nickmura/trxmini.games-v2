@@ -44,6 +44,7 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   // const [userId, setUserId] = useAtom(_userIdAtom);
   const {
     userSession,
+    authToken,
     setChess,
     setSide,
     setUserSession,
@@ -71,6 +72,7 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const socket = io(process.env.SOCKET_URL!, {
       transports: ["websocket"],
+      // withCredentials: true,
     });
 
     setSocket(socket);
@@ -165,10 +167,11 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   }, [socket, setChess]);
 
   useEffect(() => {
+    if (!authToken) return setUserSessionStatus("unauthenticated");
     // check if current user is loggedin
     // and set session data & status accordingly
     (async () => {
-      const data = await getUserSessionData();
+      const data = await getUserSessionData(authToken);
       setUserSession(data);
 
       if (data) {
@@ -177,7 +180,7 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
         setUserSessionStatus("unauthenticated");
       }
     })();
-  }, [setUserSessionStatus, setUserSession]);
+  }, [authToken, setUserSessionStatus, setUserSession]);
 
   return (
     <>
