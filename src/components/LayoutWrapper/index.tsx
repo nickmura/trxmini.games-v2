@@ -158,7 +158,8 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!socket) return;
     socket?.on("update:chess", (data) => {
-      // console.log(data, "update:chess");
+      new Audio("/audio/chess/move-self.mp3").play();
+
       setChess(data);
     });
 
