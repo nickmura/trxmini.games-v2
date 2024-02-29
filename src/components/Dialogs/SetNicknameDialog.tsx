@@ -38,7 +38,7 @@ export const SetNicknameDialog = () => {
   const [open, setOpen] = useAtom(setNicknameDialogAtom);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { userSession } = useStore();
+  const { userSession, authToken } = useStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,8 +56,8 @@ export const SetNicknameDialog = () => {
         body: JSON.stringify({ nickname: values.nickname }),
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
-        credentials: "include",
       }
     );
 
