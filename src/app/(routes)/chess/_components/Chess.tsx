@@ -16,7 +16,6 @@ export const Chess = () => {
 
   // const [fen, setFen] = useState(DEFAULT_POSITION);
 
-  const searchParams = useSearchParams();
   const [optionSquares, setOptionSquares] = useState({});
 
   const socket = useSocket();
@@ -26,14 +25,14 @@ export const Chess = () => {
   const userId = userSession?.id;
 
   const handleDrop = (sourceSquare: Square, targetSquare: Square) => {
-    console.log("handleDrop");
+    // console.log("handleDrop");
     const moveData = {
       from: sourceSquare,
       to: targetSquare,
       promotion: "q", // always promote to a queen for simplicity
     };
 
-    console.log("moveData", moveData);
+    // console.log("moveData", moveData);
 
     try {
       // console.log(stateFromSocket?.fen);

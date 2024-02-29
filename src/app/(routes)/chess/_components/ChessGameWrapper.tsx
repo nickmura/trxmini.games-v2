@@ -14,7 +14,7 @@ export const ChessGameWrapper = () => {
 
   const { chess, userSessionStatus } = useStore();
 
-  const isLoading = chess === null || userSessionStatus === "loading";
+  const isLoading = !chess?.roomId || userSessionStatus === "loading";
   const isInGameRoom = chess?.roomId;
 
   useEffect(() => {
