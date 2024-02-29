@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo, forwardRef, CSSProperties } from "react";
 import { Chessboard } from "react-chessboard";
-import { Chess as ChessJS, Square } from "chess.js";
+import { Chess as ChessJS, DEFAULT_POSITION, Square } from "chess.js";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { CustomSquareProps } from "react-chessboard/dist/chessboard/types";
@@ -14,6 +14,8 @@ export const Chess = () => {
   const chessJs = useMemo(() => new ChessJS(), []); // <- 1
   const [over, setOver] = useState("");
 
+  // const [fen, setFen] = useState(DEFAULT_POSITION);
+
   const searchParams = useSearchParams();
   const [optionSquares, setOptionSquares] = useState({});
 
@@ -24,21 +26,54 @@ export const Chess = () => {
   const userId = userSession?.id;
 
   const handleDrop = (sourceSquare: Square, targetSquare: Square) => {
+    console.log("handleDrop");
     const moveData = {
       from: sourceSquare,
       to: targetSquare,
       promotion: "q", // always promote to a queen for simplicity
     };
 
+    console.log("moveData", moveData);
+
     try {
       // console.log(stateFromSocket?.fen);
       if (chess?.fen) {
         chessJs.load(chess?.fen);
-        chessJs.move(moveData);
+        const moveResult = chessJs.move(moveData);
         setChess({ ...chess, fen: chessJs.fen() });
+        // new Audio("/audio/chess/move-self.mp3").play();\
+
+        if (chessJs.isCheck()) {
+          new Audio("/audio/chess/move-check.mp3").play();
+        } else if (moveResult?.captured) {
+          new Audio("/audio/chess/capture.mp3").play();
+        } else {
+          new Audio("/audio/chess/move-self.mp3").play();
+        }
       }
+
+      // if (fen) {
+      //   chessJs.load(fen);
+      //   const moveResult = chessJs.move(moveData);
+      //   // moveResult.captured
+
+      //   setFen(chessJs.fen());
+
+      //   // console.log(moveResult, "moveResult");
+
+      //   if (chessJs.isCheck()) {
+      //     new Audio("/audio/chess/move-check.mp3").play();
+      //   } else if (moveResult?.captured) {
+      //     new Audio("/audio/chess/capture.mp3").play();
+      //   } else {
+      //     new Audio("/audio/chess/move-self.mp3").play();
+      //   }
+      // }
+
+      // return true;
     } catch (e) {
       console.log(e, "err");
+      // return false;
     }
 
     try {
@@ -180,25 +215,11 @@ export const Chess = () => {
       </div>
       {isInGameRoom ? (
         <>
-          {/* {!chess.isGameOver() && ( */}
           <>{chess.turn === side ? "Your turn" : "Their turn"}</>
-          {/* )} */}
         </>
       ) : (
         <></>
-        // <div>{/* <Button onClick={joinGame}>Join a game</Button> */}</div>
       )}
-      {/* {isInGameRoom && (
-        <div>
-          <div>
-            Player 1 {chess?.player1.isConnected ? "online" : "offline"}
-          </div>
-          <div>
-            Player 2 {chess?.player2.isConnected ? "online" : "offline"}
-          </div>
-        </div>
-      )} */}
-      {/* <div><pre>{JSON.stringify(gameRoom, null, 2)}</pre></div> */}
     </div>
   );
 };

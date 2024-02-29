@@ -15,6 +15,10 @@ import Link from "next/link";
 import { Spinner } from "../ui/spinner";
 import { useAuth } from "@/hooks/auth";
 
+// export const eventAPI = "https://146.190.244.186:5020/api";
+export const eventAPI =
+  "https://nile.trongrid.io/v1/transactions/80ba83dbcd72f60326a6363aa9f2624095f5f6d8e14d73a3dccacdc028f46d98/events";
+
 export const StartGame = () => {
   const { chess, userSession, userSessionStatus } = useStore();
   const [, setShowStartGameDialog] = useAtom(startGameDialogAtom);
@@ -24,7 +28,31 @@ export const StartGame = () => {
   const isInGameRoom = chess?.roomId;
   const isAuthenticated = userSessionStatus === "authenticated";
 
-  console.log({ userSession, userSessionStatus });
+  // const handleStartGame = async () => {
+  //   const room = { index: undefined };
+  //   let counter = 0;
+  //   // if (room.stake != '0') {
+  //   while (
+  //     (room.index == "" && counter < 5000) ||
+  //     (room.index == undefined && counter < 5000)
+  //   ) {
+  //     counter++;
+  //     let events;
+  //     const res = await fetch(eventAPI);
+  //     console.log(res, "Res");
+  //     if (res) {
+  //       events = await res.json();
+  //       console.log(events, "events");
+  //       break;
+  //     }
+  //     // let event = events.data.find((event :any) => event?.result._gameId == uuid.toString())
+  //     // room.index = event?.result.index;
+  //   }
+  //   // }
+  //   console.log(counter);
+  // };
+
+  // console.log({ userSession, userSessionStatus });
 
   return isInGameRoom ? (
     <Button disabled>In a game </Button>
@@ -66,6 +94,7 @@ export const StartGame = () => {
                 <DropdownMenuItem
                   onClick={() => {
                     setShowStartGameDialog({ isCloseable: true, isOpen: true });
+                    // handleStartGame();
                   }}
                 >
                   Start a game
