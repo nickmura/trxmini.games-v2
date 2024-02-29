@@ -156,6 +156,7 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   }, [socket, userSession?.id, setChess, searchParams, params.roomId]);
 
   useEffect(() => {
+    if (!socket) return;
     socket?.on("update:chess", (data) => {
       // console.log(data, "update:chess");
       setChess(data);
@@ -165,6 +166,27 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
       socket?.off("update:chess");
     };
   }, [socket, setChess]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket?.on("end:chess", (data) => {
+      toast.dismiss("end:chess");
+
+      const isWinner = data.data.winner === userSession?.id;
+
+      const toastText = isWinner
+        ? "Opponent quit the game, so you won!"
+        : "You quit the game.";
+
+      toast.success(toastText);
+      router.push("/chess/lobby");
+    });
+
+    return () => {
+      socket?.off("end:chess");
+    };
+  }, [socket, userSession?.id, router, setChess]);
 
   useEffect(() => {
     if (!authToken) return setUserSessionStatus("unauthenticated");

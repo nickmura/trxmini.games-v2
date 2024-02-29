@@ -1,4 +1,5 @@
 import { startGameDialogAtom } from "@/atoms/startGameDialog.atom";
+import { useSocket } from "@/components/LayoutWrapper";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useStore } from "@/store";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
 import toast from "react-hot-toast";
@@ -20,12 +22,19 @@ export const LeaveGameDialog = ({
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const router = useRouter();
+  const socket = useSocket();
+
+  const { chess, userSession } = useStore();
 
   const handleLeaveGame = () => {
-    toast.success(`Successfully quited game`);
-    setOpen(false);
-    router.push("/chess/lobby");
+    if (!socket || !chess?.roomId || !userSession?.id)
+      return toast.error(`Couldn't leave the game.Please try again later!`);
+
+    toast.loading("Leaving the game...", { id: "end:chess" });
+    socket?.emit("end:chess", {
+      roomId: chess.roomId,
+      userId: userSession.id,
+    });
   };
 
   return (
