@@ -14,6 +14,8 @@ export type ISocketState = {
   turn: "w" | "b";
   stake: number;
   onlineCount: number;
+  endedAt?: string; // Date;
+  winner?: string;
 };
 
 export type IChat = {

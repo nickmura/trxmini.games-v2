@@ -25,6 +25,7 @@ export const Chess = () => {
   const userId = userSession?.id;
 
   const handleDrop = (sourceSquare: Square, targetSquare: Square) => {
+    if (isEndedGame) return false;
     // console.log("handleDrop");
     const moveData = {
       from: sourceSquare,
@@ -123,6 +124,7 @@ export const Chess = () => {
 
   const isLoading = chess === null;
   const isInGameRoom = chess?.roomId;
+  const isEndedGame = !!chess?.endedAt;
 
   const isCheckmate = useMemo(() => {
     if (chess?.fen) {
@@ -143,6 +145,8 @@ export const Chess = () => {
     }
     return false;
   }, [chessJs, chess?.fen]);
+
+  console.log({ chess, isEndedGame });
 
   // const checkedSquare = // useMemo(
   // () =>
@@ -183,13 +187,14 @@ export const Chess = () => {
         )}
         <div className="">
           <Chessboard
-            arePiecesDraggable={chess?.turn === side}
+            arePiecesDraggable={isEndedGame ? false : chess?.turn === side}
             position={chess?.fen}
             onPieceDrop={handleDrop}
             boardWidth={500}
             showBoardNotation
             boardOrientation={side === "w" ? "white" : "black"}
             isDraggablePiece={({ piece }) => {
+              if (isEndedGame) return false;
               if (piece?.startsWith(chess?.turn || "")) return true;
               return false;
             }}
@@ -212,13 +217,9 @@ export const Chess = () => {
           />
         </div>
       </div>
-      {isInGameRoom ? (
-        <>
-          <>{chess.turn === side ? "Your turn" : "Their turn"}</>
-        </>
-      ) : (
-        <></>
-      )}
+      {isInGameRoom && !isEndedGame ? (
+        <>{chess.turn === side ? "Your turn" : "Their turn"}</>
+      ) : null}
     </div>
   );
 };
