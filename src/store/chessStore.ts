@@ -1,13 +1,13 @@
-import { ISocketState } from "@/app/(routes)/chess/types/index.types";
+import { IChessRoomState } from "@/app/(routes)/chess/types/index.types";
 import { Socket } from "socket.io-client";
 import { create, StateCreator } from "zustand";
 
 export interface ChessSlice {
   side: "w" | "b";
   setSide: (data: ChessSlice["side"]) => void;
-  chess: ISocketState | null;
+  chess: IChessRoomState | null;
   setChess: (data: ChessSlice["chess"]) => void;
-  chessLobby: Array<ISocketState> | null;
+  chessLobby: Array<IChessRoomState> | null;
   setChessLobby: (data: ChessSlice["chessLobby"]) => void;
   leaveChessRoom: () => void;
   updateChessRoom: () => void;

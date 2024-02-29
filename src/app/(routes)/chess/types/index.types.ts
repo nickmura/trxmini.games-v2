@@ -1,4 +1,4 @@
-export type ISocketState = {
+export type IChessRoomState = {
   roomId: string;
   player1: {
     userId: string | null;

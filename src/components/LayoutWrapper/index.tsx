@@ -5,7 +5,7 @@ import { ReactNode, useEffect } from "react";
 import { Socket, io } from "socket.io-client";
 import { Dialogs } from "../Dialogs";
 import { useStore } from "@/store";
-import { ISocketState } from "@/app/(routes)/chess/types/index.types";
+import { IChessRoomState } from "@/app/(routes)/chess/types/index.types";
 import {
   useParams,
   usePathname,
@@ -89,7 +89,7 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
 
     socket?.on(
       "created:chess-room",
-      (data: { message: string; data: ISocketState }) => {
+      (data: { message: string; data: IChessRoomState }) => {
         toast.dismiss("create:chess-room");
         toast.success(data.message);
 
@@ -111,7 +111,7 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
 
     socket?.on(
       "joined:chess",
-      (data: { message: string; data: ISocketState }) => {
+      (data: { message: string; data: IChessRoomState }) => {
         setChess(data?.data);
 
         // const url = new URL(window.location.href);
@@ -151,7 +151,7 @@ export const LayoutWrapper = ({ children }: { children: ReactNode }) => {
       socket?.emit("join:chess:room", { roomId, userId });
     } else {
       // shows game join dialog on /chess route
-      setChess({} as ISocketState);
+      setChess({} as IChessRoomState);
     }
   }, [socket, userSession?.id, setChess, searchParams, params.roomId]);
 
